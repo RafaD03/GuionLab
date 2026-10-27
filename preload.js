@@ -16,5 +16,8 @@ contextBridge.exposeInMainWorld('api', {
   confirmClose: opts => ipcRenderer.invoke('app:confirmClose', opts),
   forceClose: () => ipcRenderer.send('app:forceClose'),
   onExternalChange: cb => ipcRenderer.on('file:external-change', (e, d) => cb(d)),
-  openExternal: url => ipcRenderer.invoke('app:openExternal', url)
+  openExternal: url => ipcRenderer.invoke('app:openExternal', url),
+  checkUpdate: () => ipcRenderer.invoke('updater:check'),
+  installUpdateNow: () => ipcRenderer.invoke('updater:installNow'),
+  onUpdateStatus: cb => ipcRenderer.on('updater:status', (e, d) => cb(d))
 });

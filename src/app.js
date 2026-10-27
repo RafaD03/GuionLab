@@ -14,6 +14,9 @@ if (!window.api) window.api = {
   saveAs: async () => null,
   renameFile: async () => ({ success: false }),
   createInitialProject: async () => ({ success: false }),
+  checkUpdate: async () => ({ status: 'dev' }),
+  installUpdateNow: async () => true,
+  onUpdateStatus: () => {},
   pdf: async () => { try { window.print(); } catch (x) {} return null; },
   onMenu: () => {}
 };
@@ -1516,6 +1519,16 @@ const V = {
         <input type="checkbox" id="cfg-focusbox" ${CFG.scriptFocusBox ? 'checked' : ''} data-a="togglefocusbox">
         <span class="slider"></span>
       </label>
+    </div>` +
+    `<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;gap:20px;margin-top:14px">
+      <div style="flex:1">
+        <b style="font-size:16px;display:block;margin-bottom:4px">Actualizaciones automáticas</b>
+        <span class="mu" style="font-size:14px;line-height:1.4;display:block">
+          Versión instalada: <b>v1.6.5</b> · Conectado con GitHub Releases.
+          <span id="cfg-update-status" style="display:block;margin-top:4px;color:var(--ac);font-weight:600"></span>
+        </span>
+      </div>
+      <button class="btn g sm" data-a="checkupdatebtn" style="flex:none;padding:8px 14px;font-weight:600">🔍 Buscar actualizaciones</button>
     </div>`
 };
 
@@ -2232,6 +2245,21 @@ const A = {
     if (b) b.style.display = 'none';
     return false;
   },
+  installupdatenow() {
+    if (window.api && api.installUpdateNow) api.installUpdateNow();
+    return false;
+  },
+  dismissupdatebanner() {
+    const b = $('#update-banner');
+    if (b) b.style.display = 'none';
+    return false;
+  },
+  checkupdatebtn() {
+    const cfgSt = $('#cfg-update-status');
+    if (cfgSt) cfgSt.textContent = 'Buscando actualizaciones en GitHub…';
+    if (window.api && api.checkUpdate) api.checkUpdate();
+    return false;
+  },
   opendrivedl() {
     if (window.api && api.openExternal) api.openExternal('https://www.google.com/drive/download/');
     return false;
@@ -2592,6 +2620,38 @@ if (api.onExternalChange) {
     if (b) {
       b.style.display = 'flex';
       st('⚠ Cambios detectados en el archivo en disco');
+    }
+  });
+}
+
+if (api.onUpdateStatus) {
+  api.onUpdateStatus(data => {
+    if (!data) return;
+    if (data.status === 'ready') {
+      const b = $('#update-banner');
+      if (b) {
+        const titleEl = $('#update-banner-title');
+        if (titleEl) titleEl.textContent = `¡GuionLab v${data.version || ''} listo para instalar!`;
+        b.style.display = 'flex';
+      }
+      const cfgSt = $('#cfg-update-status');
+      if (cfgSt) cfgSt.textContent = `🎉 ¡Versión v${data.version || ''} lista para instalar!`;
+      st(`¡Actualización v${data.version || ''} lista!`);
+    } else if (data.status === 'downloading') {
+      const cfgSt = $('#cfg-update-status');
+      if (cfgSt) cfgSt.textContent = `Descargando actualización: ${data.percent || 0}%…`;
+      st(`Descargando actualización: ${data.percent || 0}%…`);
+    } else if (data.status === 'available') {
+      const cfgSt = $('#cfg-update-status');
+      if (cfgSt) cfgSt.textContent = `Nueva versión v${data.version || ''} encontrada. Descargando…`;
+      st(`Nueva versión v${data.version || ''} encontrada`);
+    } else if (data.status === 'not-available') {
+      const cfgSt = $('#cfg-update-status');
+      if (cfgSt) cfgSt.textContent = '✓ GuionLab está actualizado a la última versión.';
+      st('GuionLab al día ✓');
+    } else if (data.status === 'error') {
+      const cfgSt = $('#cfg-update-status');
+      if (cfgSt) cfgSt.textContent = 'No se pudo conectar con el servidor de actualizaciones.';
     }
   });
 }

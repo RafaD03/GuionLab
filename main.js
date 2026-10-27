@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain, nativeTheme, shell } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const fs = require('fs'), path = require('path');
 let win;
 let forceQuit = false;
@@ -44,6 +45,11 @@ function createWindow() {
     if (win && !win.isDestroyed()) {
       win.show();
       win.focus();
+      setTimeout(() => {
+        if (app.isPackaged) {
+          checkAndNotifyUpdate(false);
+        }
+      }, 3500);
     }
   });
 
@@ -88,6 +94,7 @@ const menu = [
     { type: 'separator' }, { role: 'togglefullscreen', label: 'Pantalla completa' }] },
   { label: 'Ayuda', submenu: [
     { label: 'Guía y ayuda…', accelerator: 'F1', click: () => send('help') },
+    { label: 'Buscar actualizaciones…', click: () => checkAndNotifyUpdate(true) },
     { type: 'separator' },
     { label: 'Descargar Google Drive para ordenadores…', click: () => shell.openExternal('https://www.google.com/drive/download/') },
     { label: 'Descargar Dropbox para ordenadores…', click: () => shell.openExternal('https://www.dropbox.com/install') },
@@ -554,7 +561,103 @@ ipcMain.handle('file:delete', async (e, filePath) => {
   }
 });
 
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+autoUpdater.logger = {
+  info: m => console.log('[autoUpdater]', m),
+  warn: m => console.warn('[autoUpdater]', m),
+  error: m => console.error('[autoUpdater]', m)
+};
+
+function sendUpdaterStatus(payload) {
+  if (win && win.webContents && !win.webContents.isDestroyed()) {
+    win.webContents.send('updater:status', payload);
+  }
+}
+
+function checkAndNotifyUpdate(manual = false) {
+  if (!app.isPackaged) {
+    if (manual) {
+      dialog.showMessageBox(win, {
+        type: 'info',
+        title: 'Actualizaciones de GuionLab',
+        message: 'Modo desarrollo activo',
+        detail: 'Las actualizaciones automáticas se comprueban en la versión instalada de GuionLab (conectada a GitHub Releases).'
+      });
+    }
+    return;
+  }
+  autoUpdater.checkForUpdates().catch(err => {
+    console.warn('[autoUpdater] Error al comprobar actualizaciones:', err.message);
+    if (manual) {
+      dialog.showMessageBox(win, {
+        type: 'warning',
+        title: 'Actualizaciones de GuionLab',
+        message: 'No se pudo conectar con GitHub Releases',
+        detail: 'Comprueba tu conexión a Internet o inténtalo de nuevo más tarde.'
+      });
+    }
+  });
+}
+
+function setupAutoUpdater() {
+  autoUpdater.on('checking-for-update', () => {
+    sendUpdaterStatus({ status: 'checking', message: 'Comprobando si hay actualizaciones…' });
+  });
+
+  autoUpdater.on('update-available', info => {
+    sendUpdaterStatus({
+      status: 'available',
+      version: info.version,
+      message: `Nueva versión v${info.version} encontrada. Descargando en segundo plano…`
+    });
+  });
+
+  autoUpdater.on('update-not-available', info => {
+    sendUpdaterStatus({
+      status: 'not-available',
+      version: info.version,
+      message: 'GuionLab está actualizado a la última versión.'
+    });
+  });
+
+  autoUpdater.on('download-progress', progress => {
+    sendUpdaterStatus({
+      status: 'downloading',
+      percent: Math.round(progress.percent || 0),
+      message: `Descargando actualización: ${Math.round(progress.percent || 0)}%`
+    });
+  });
+
+  autoUpdater.on('update-downloaded', info => {
+    sendUpdaterStatus({
+      status: 'ready',
+      version: info.version,
+      message: `¡GuionLab v${info.version} listo para instalar!`
+    });
+  });
+
+  autoUpdater.on('error', err => {
+    sendUpdaterStatus({
+      status: 'error',
+      message: err.message || 'Error al comprobar actualizaciones'
+    });
+  });
+
+  ipcMain.handle('updater:check', () => {
+    checkAndNotifyUpdate(true);
+    return { success: true };
+  });
+
+  ipcMain.handle('updater:installNow', () => {
+    forceQuit = true;
+    autoUpdater.quitAndInstall(false, true);
+    return true;
+  });
+}
+
 app.whenReady().then(() => {
+  setupAutoUpdater();
   Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
   createWindow();
   app.on('activate', () => {
