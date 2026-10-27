@@ -654,21 +654,30 @@ function setupAutoUpdater() {
       version: info.version,
       message: `¡GuionLab v${info.version} listo para instalar!`
     });
+    if (win && !win.isDestroyed()) {
+      dialog.showMessageBox(win, {
+        type: 'info',
+        buttons: ['Reiniciar y actualizar ahora', 'Instalar al salir'],
+        defaultId: 0,
+        cancelId: 1,
+        title: 'Actualización lista',
+        message: `¡GuionLab v${info.version} se ha descargado correctamente!`,
+        detail: '¿Deseas reiniciar la aplicación ahora para instalar la nueva versión?'
+      }).then(res => {
+        if (res.response === 0) {
+          forceQuit = true;
+          autoUpdater.quitAndInstall(false, true);
+        }
+      });
+    }
   });
 
   autoUpdater.on('error', err => {
     const msg = String(err && err.message ? err.message : '');
-    const isNotFound = msg.includes('404') || msg.includes('latest.yml') || msg.includes('Cannot find') || msg.includes('release');
-    if (isNotFound) {
-      sendUpdaterStatus({
-        status: 'not-available',
-        message: `GuionLab está al día (v${app.getVersion()}).`
-      });
-      return;
-    }
+    console.error('[autoUpdater] Error:', msg);
     sendUpdaterStatus({
       status: 'error',
-      message: err.message || 'Error al comprobar actualizaciones'
+      message: err.message || 'Error al comprobar o descargar la actualización'
     });
   });
 
