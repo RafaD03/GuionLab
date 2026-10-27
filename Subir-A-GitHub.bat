@@ -19,5 +19,5 @@ git push origin main
 
 echo.
 echo ========================================================
-echo ¡Completado! Presiona cualquier tecla para salir...
+echo ?Completado! Presiona cualquier tecla para salir...
 pause > nul
