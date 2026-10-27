@@ -126,5 +126,5 @@ Los proyectos se guardan en formato estándar abierto `.guion` (estructura JSON 
 
 Desarrollado con pasión por **Rafael Dobón Romo**  
 * Guion cinematográfico, diseño de herramientas para creativos y desarrollo de software.  
-* Contacto: [contacto@guionlab.com](mailto:contacto@guionlab.com)
+* Contacto: [rafadobonromo@gmail.com](mailto:rafadobonromo@gmail.com)
 * Repositorio: [https://github.com/RafaD03/GuionLab](https://github.com/RafaD03/GuionLab)
