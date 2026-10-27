@@ -1320,20 +1320,6 @@ function renderNavBar() {
 
 const V = {
   cover: () => head('Portada', 'Los datos de tu proyecto. Aparecen en el dossier.') +
-    `<div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;margin-bottom:16px;gap:16px">
-      <div>
-        <b style="font-size:14px;display:flex;align-items:center;gap:6px">
-          ${S.collab ? '👥 Proyecto Colaborativo' : '👤 Proyecto Individual'}
-        </b>
-        <span class="mu" style="font-size:13px;display:block;margin-top:2px">
-          ${S.collab ? 'Detección automática de cambios en disco activa para carpetas compartidas (Drive, Dropbox, OneDrive).' : 'Trabajo en local. Puedes pasarlo a colaborativo cuando quieras.'}
-        </span>
-      </div>
-      <div class="row" style="gap:6px;flex:none">
-        <button class="btn sm ${S.collab ? 'g' : ''}" data-a="setmode" data-v="solo">👤 Individual</button>
-        <button class="btn sm ${S.collab ? '' : 'g'}" data-a="setmode" data-v="collab">👥 Colaborativo</button>
-      </div>
-    </div>` +
     f('cover.title', 'Título') + f('cover.author', 'Autor o autora') + f('cover.genre', 'Género y tono', '', 'Ej.: thriller psicológico, comedia negra') + f('cover.contact', 'Contacto', '', 'Correo o teléfono') + f('cover.date', 'Fecha o versión', '', 'Ej.: Borrador 1, octubre 2026'),
   syn: () => head('Tagline y sinopsis', 'El tagline vende la película en una frase. La sinopsis cuenta la historia completa, final incluido.') + f('tag', 'Tagline', '', 'Una frase corta y con gancho') + '<span class="mu" data-c="tag"></span>' + f('syn', 'Sinopsis', 'ta', 'Protagonista, conflicto, giro y final. Entre 150 y 300 palabras.') + '<span class="mu" data-c="syn" data-u="w"></span>',
   str: () => {
@@ -1495,6 +1481,28 @@ const V = {
       + (S.treat ? '<h2>Tratamiento</h2>' + P(S.treat) : '');
   },
   config: () => head('Configuración', 'Opciones generales y preferencias visuales de la aplicación.') +
+    (currentId ?
+      `<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;gap:20px;margin-bottom:14px">
+        <div style="flex:1">
+          <b style="font-size:16px;display:block;margin-bottom:4px">Modalidad de trabajo del proyecto</b>
+          <span class="mu" style="font-size:14px;line-height:1.4;display:block">
+            ${S.collab ? '👥 <b>Modo Colaborativo activo:</b> Sincronización en vivo con Google Drive, OneDrive o Dropbox para escribir a 4 manos.' : '👤 <b>Modo Individual activo:</b> Proyecto para escribir en solitario en este equipo.'}
+          </span>
+        </div>
+        <div class="row" style="gap:6px;flex:none">
+          <button class="btn sm ${S.collab ? 'g' : ''}" data-a="setmode" data-v="solo">👤 Individual</button>
+          <button class="btn sm ${S.collab ? '' : 'g'}" data-a="setmode" data-v="collab">👥 Colaborativo</button>
+        </div>
+      </div>` :
+      `<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;gap:20px;margin-bottom:14px">
+        <div style="flex:1">
+          <b style="font-size:16px;display:block;margin-bottom:4px">Modalidad de trabajo</b>
+          <span class="mu" style="font-size:14px;line-height:1.4;display:block">
+            Abre un proyecto para cambiar su modalidad entre Individual o Colaborativo (a 4 manos con Drive, OneDrive o Dropbox).
+          </span>
+        </div>
+      </div>`
+    ) +
     `<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;gap:20px;margin-bottom:14px">
       <div style="flex:1">
         <b style="font-size:16px;display:block;margin-bottom:4px">Tema de la interfaz</b>
@@ -1524,7 +1532,7 @@ const V = {
       <div style="flex:1">
         <b style="font-size:16px;display:block;margin-bottom:4px">Actualizaciones automáticas</b>
         <span class="mu" style="font-size:14px;line-height:1.4;display:block">
-          Versión instalada: <b>v1.6.5</b> · Conectado con GitHub Releases.
+          Versión instalada: <b>v1.6.6</b> · Conectado con GitHub Releases.
           <span id="cfg-update-status" style="display:block;margin-top:4px;color:var(--ac);font-weight:600"></span>
         </span>
       </div>
@@ -1611,7 +1619,7 @@ function renderLauncher() {
 
     <div class="launcher-footer">
       <span class="lf-left">Developed by Rafa Dobón</span>
-      <span class="lf-right">v1.6.5</span>
+      <span class="lf-right">v1.6.6</span>
     </div>
   </div>`;
 }
@@ -2232,8 +2240,9 @@ const A = {
   },
   setmode(i, t) {
     S.collab = (t.dataset.v === 'collab');
-    persist(false, false);
+    persist(true, true);
     render();
+    st(S.collab ? 'Cambiado a Modo Colaborativo 👥' : 'Cambiado a Modo Individual 👤');
     return false;
   },
   reloadcollab() {

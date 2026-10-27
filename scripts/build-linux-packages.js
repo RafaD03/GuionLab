@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 const tar = require('tar');
 
@@ -43,7 +43,7 @@ async function buildDeb() {
 
   // 2. Control files
   const controlContent = `Package: guionlab
-Version: 1.6.5
+Version: 1.6.6
 Section: utils
 Priority: optional
 Architecture: amd64
@@ -162,7 +162,7 @@ exec /opt/guionlab/guionlab "$@"
   );
 
   // 4. Assemble ar archive (.deb)
-  const debOutputPath = path.join(DIST, 'GuionLab_1.6.5_amd64.deb');
+  const debOutputPath = path.join(DIST, 'GuionLab_1.6.6_amd64.deb');
   console.log('  -> Ensamblando archivo final .deb...');
 
   const debStream = fs.createWriteStream(debOutputPath);
@@ -200,7 +200,7 @@ exec /opt/guionlab/guionlab "$@"
 async function buildUniversalPackage() {
   console.log('📦 Construyendo paquete universal para Linux con instalador automático...');
   const stagingRoot = path.join(DIST, 'linux-pkg-staging');
-  const bundleDir = path.join(stagingRoot, 'GuionLab-v1.6.5-Linux');
+  const bundleDir = path.join(stagingRoot, 'GuionLab-v1.6.6-Linux');
 
   fs.rmSync(stagingRoot, { recursive: true, force: true });
   fs.mkdirSync(bundleDir, { recursive: true });
@@ -231,7 +231,7 @@ Keywords=script;screenplay;guion;cine;teatro;historia;
   // 4. Script de instalación automática
   const installShContent = `#!/bin/bash
 # ========================================================
-# Instalador de GuionLab Studio v1.6.5 para Linux
+# Instalador de GuionLab Studio v1.6.6 para Linux
 # ========================================================
 
 set -e
@@ -244,7 +244,7 @@ BOLD='\\\\033[1m'
 NC='\\\\033[0m'
 
 echo -e "\${CYAN}\${BOLD}========================================================\${NC}"
-echo -e "\${CYAN}\${BOLD}         Instalador de GuionLab Studio v1.6.5          \${NC}"
+echo -e "\${CYAN}\${BOLD}         Instalador de GuionLab Studio v1.6.6          \${NC}"
 echo -e "\${CYAN}\${BOLD}========================================================\${NC}"
 echo ""
 
@@ -363,10 +363,10 @@ exec "$SCRIPT_DIR/guionlab/guionlab" "$@"
 
   // 7. README-LINUX.txt
   const readmeContent = `========================================================
-GUIONLAB STUDIO v1.6.5 PARA LINUX
+GUIONLAB STUDIO v1.6.6 PARA LINUX
 ========================================================
 
-¡Hola! Esta es la versión de GuionLab Studio v1.6.5 para sistemas GNU/Linux
+¡Hola! Esta es la versión de GuionLab Studio v1.6.6 para sistemas GNU/Linux
 (Ubuntu, Linux Mint, Debian, Fedora, Arch Linux, Manjaro, openSUSE, etc.).
 
 OPCIÓN 1: INSTALACIÓN EN EL SISTEMA (RECOMENDADA)
@@ -398,8 +398,8 @@ Para desinstalar GuionLab en cualquier momento:
   fs.writeFileSync(path.join(bundleDir, 'README-LINUX.txt'), readmeContent.replace(/\\r\\n/g, '\\n'), 'utf8');
 
   // Pack tar.gz
-  const tarOutputPath = path.join(DIST, 'GuionLab-v1.6.5-Linux.tar.gz');
-  console.log('  -> Creando archivo comprimido GuionLab-v1.6.5-Linux.tar.gz...');
+  const tarOutputPath = path.join(DIST, 'GuionLab-v1.6.6-Linux.tar.gz');
+  console.log('  -> Creando archivo comprimido GuionLab-v1.6.6-Linux.tar.gz...');
   await tar.c(
     {
       gzip: true,
@@ -407,7 +407,7 @@ Para desinstalar GuionLab en cualquier momento:
       file: tarOutputPath,
       cwd: stagingRoot
     },
-    ['GuionLab-v1.6.5-Linux']
+    ['GuionLab-v1.6.6-Linux']
   );
 
   console.log(`✓ Paquete universal creado exitosamente: ${tarOutputPath}`);

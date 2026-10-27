@@ -1,8 +1,8 @@
-========================================================
-GUIONLAB STUDIO v1.6.5 PARA MACOS
+﻿========================================================
+GUIONLAB STUDIO v1.6.6 PARA MACOS
 ========================================================
 
-¡Hola! Esta es la versión v1.6.5 de GuionLab (reescritura de archivo directa, guardado transparente y lista de personajes fija optimizada) lista para ordenadores Mac (tanto Apple Silicon M1/M2/M3/M4 como Intel).
+¡Hola! Esta es la versión v1.6.6 de GuionLab (reescritura de archivo directa, guardado transparente y lista de personajes fija optimizada) lista para ordenadores Mac (tanto Apple Silicon M1/M2/M3/M4 como Intel).
 
 CÓMO USARLO EN MAC:
 --------------------------------------------------------

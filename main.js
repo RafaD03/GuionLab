@@ -595,14 +595,14 @@ function checkAndNotifyUpdate(manual = false) {
     if (isNotFound) {
       sendUpdaterStatus({
         status: 'not-available',
-        message: 'GuionLab está actualizado a la última versión (v1.6.5).'
+        message: `GuionLab está actualizado a la última versión (v${app.getVersion()}).`
       });
       if (manual) {
         dialog.showMessageBox(win, {
           type: 'info',
           title: 'Actualizaciones de GuionLab',
           message: 'GuionLab está al día',
-          detail: 'Tienes la versión más reciente instalada (v1.6.5). No hay nuevas actualizaciones publicadas en GitHub.'
+          detail: `Tienes la versión más reciente instalada (v${app.getVersion()}). No hay nuevas actualizaciones publicadas en GitHub.`
         });
       }
       return;
@@ -662,7 +662,7 @@ function setupAutoUpdater() {
     if (isNotFound) {
       sendUpdaterStatus({
         status: 'not-available',
-        message: 'GuionLab está al día (v1.6.5).'
+        message: `GuionLab está al día (v${app.getVersion()}).`
       });
       return;
     }
