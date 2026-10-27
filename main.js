@@ -589,6 +589,25 @@ function checkAndNotifyUpdate(manual = false) {
   }
   autoUpdater.checkForUpdates().catch(err => {
     console.warn('[autoUpdater] Error al comprobar actualizaciones:', err.message);
+    const msg = String(err && err.message ? err.message : '');
+    const isNotFound = msg.includes('404') || msg.includes('latest.yml') || msg.includes('Cannot find') || msg.includes('release');
+
+    if (isNotFound) {
+      sendUpdaterStatus({
+        status: 'not-available',
+        message: 'GuionLab está actualizado a la última versión (v1.6.5).'
+      });
+      if (manual) {
+        dialog.showMessageBox(win, {
+          type: 'info',
+          title: 'Actualizaciones de GuionLab',
+          message: 'GuionLab está al día',
+          detail: 'Tienes la versión más reciente instalada (v1.6.5). No hay nuevas actualizaciones publicadas en GitHub.'
+        });
+      }
+      return;
+    }
+
     if (manual) {
       dialog.showMessageBox(win, {
         type: 'warning',
@@ -638,6 +657,15 @@ function setupAutoUpdater() {
   });
 
   autoUpdater.on('error', err => {
+    const msg = String(err && err.message ? err.message : '');
+    const isNotFound = msg.includes('404') || msg.includes('latest.yml') || msg.includes('Cannot find') || msg.includes('release');
+    if (isNotFound) {
+      sendUpdaterStatus({
+        status: 'not-available',
+        message: 'GuionLab está al día (v1.6.5).'
+      });
+      return;
+    }
     sendUpdaterStatus({
       status: 'error',
       message: err.message || 'Error al comprobar actualizaciones'
