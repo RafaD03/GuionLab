@@ -1,0 +1,43 @@
+{
+  "name": "guion-studio",
+  "version": "1.6.5",
+  "description": "GuionLab: preproducción de guiones, personajes, sinopsis, estructura, escaleta y tratamiento",
+  "author": {
+    "name": "Rafael Dobón Romo",
+    "email": "contacto@guionlab.com"
+  },
+  "homepage": "https://guionlab.com",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux && node scripts/build-linux-packages.js",
+    "dist:all": "electron-builder --win --mac --linux"
+  },
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.guionlab.app",
+    "productName": "GuionLab",
+    "files": ["main.js", "preload.js", "src/**/*", "build/icon.png"],
+    "win": { "target": "nsis", "icon": "build/icon.png" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "perMachine": false },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "build/icon.png",
+      "category": "public.app-category.productivity"
+    },
+    "linux": {
+      "target": ["tar.gz", "zip"],
+      "executableName": "guionlab",
+      "artifactName": "GuionLab-${version}-Linux.${ext}",
+      "icon": "build/icon.png",
+      "category": "Office",
+      "maintainer": "Rafael Dobón Romo <contacto@guionlab.com>"
+    }
+  }
+}
